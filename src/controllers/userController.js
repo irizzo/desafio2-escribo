@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel');
 const generateGUID = require('../resources/generateGUID');
-const generateAccessToken = require('../resources/generateToken');
+const tokenHelpers = require('../resources/tokenHelpers');
 
 async function signUp(req, res) {
 	try {
@@ -34,7 +34,7 @@ async function signUp(req, res) {
 		const generatedId = generateGUID();
 
 		// gerar jwt
-		const generatedToken = generateAccessToken(email);
+		const generatedToken = tokenHelpers.generateAccessToken(email);
 
 		// pegar hora/data atual
 		const currentDateAndTime = new Date();
@@ -67,39 +67,61 @@ async function signUp(req, res) {
 		res.status(500).send({
 			'mensagem': error
 		});
-
-		return
 	}
 }
 
 async function signIn(req, res) {
 	try {
+		console.log('[/sign-in]');
 
-		// TODO: verificar se o email está cadastrado
-		// if () { // email não cadastrado
-		// 	res.status(400).send({
-		// 		"mensagem": "Usuário e/ou senha inválidos"
-		// 	})
-		// }
+		const { email, senha } = req.body;
 
-		// TODO: verificar se a senha está correta
-		// if () { // senha incorreta
-		// 	res.status(401).send({
-		// 		"mensagem": "Usuário e/ou senha inválidos"
-		// 	})
-		// }
+		// verificações básicas
+		if (!email || !senha) {
+			res.status(401).send({
+				"mensagem": "Preencha todos os campos."
+			})
 
-		// TODO: recuperar dados
+			return;
+		}
+
+		// verificar se o email está cadastrado
+		const userFound = await userModel.getUserByEmail(email);
+		console.log(`userFound = ${JSON.stringify(userFound)}`);
+
+		if (!userFound) { // email não cadastrado
+			res.status(400).send({
+				"mensagem": "Usuário e/ou senha inválidos"
+			})
+		};
+
+		// verificar se a senha está correta
+		if (userFound.senha !== senha) { // senha incorreta
+			res.status(401).send({
+				"mensagem": "Usuário e/ou senha inválidos"
+			})
+		};
 
 		// pegar hora/data atual para atualizar último login
-		const currentDateAndTime = Date.now();
+		const currentDateAndTime = new Date;
+		console.log(`currentDateAndTime = ${currentDateAndTime}`);
+
+		// gerar jwt
+		const generatedToken = tokenHelpers.generateAccessToken(email);
+		console.log(`generatedToken = ${generatedToken}`);
+
+		await userModel.singInUpdate(userFound.id, {
+			"data_atualizacao": currentDateAndTime,
+			"ultimo_login": currentDateAndTime,
+			"token": generatedToken,
+		});
 
 		res.status(200).send({
-			"id": "",
-			"data_criacao": "",
-			"data_atualizacao": "",
+			"id": userFound.id,
+			"data_criacao": Date(userFound.data_criacao), // TODO: consertar formato que vem do BD
+			"data_atualizacao": currentDateAndTime,
 			"ultimo_login": currentDateAndTime,
-			"token": ""
+			"token": generatedToken,
 		})
 		
 	} catch (error) {
@@ -112,29 +134,31 @@ async function signIn(req, res) {
 async function getUser(req, res) {
 	try {
 		// recuperar token do header (Requisição: Header Authentication com valor "Bearer {token}")
+		
+		const { authentication } = req.headers;
+
+		const token = tokenHelpers.getTokenFromAuthHeader(authentication);
+
+		const isTokenValid = tokenHelpers.validateToken(token);
 
 		// TODO: validar token
-		// if () { // token inválido
-		// 	res.status(401).send({
-		// 		"mensagem": "Não autorizado"
-		// 	})
-		// }
+		if (isTokenValid === "JsonWebTokenError") { // token inválido
+			res.status(401).send({
+				"mensagem": "Não autorizado"
+			});
+			return;
+		}
 
-		// if () { // token expirado
-		// 	res.status(403).send({
-		// 		"mensagem": "Sessão inválida"
-		// 	})
-		// }
+		if (isTokenValid === "TokenExpiredError") { // token expirado
+			res.status(403).send({
+				"mensagem": "Sessão inválida"
+			})
+			return;
+		}
 		
-		// TODO: recuperar dados
-
 		res.status(200).send({
-			"id": "",
-			"data_criacao": "",
-			"data_atualizacao": "",
-			"ultimo_login": "",
-			"token": ""
-		})
+			"mensagem": "Token válido"
+		});
 
 	} catch (error) {
 		res.status(500).send({
