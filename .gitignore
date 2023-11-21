@@ -3,4 +3,5 @@
 .env
 
 notes.md
+
 src/firebaseCredentials.json

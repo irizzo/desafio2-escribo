@@ -3,7 +3,7 @@ const { db } = require('../firebaseConfig');
 const usersCollectionRef = db.collection('users');
 
 async function createDbUser(userInfo) {
-	console.log("[createDbUser]");
+	console.log('[createDbUser]');
 
 	const userRef = await usersCollectionRef.doc(userInfo.id).set(userInfo);
 
@@ -12,7 +12,7 @@ async function createDbUser(userInfo) {
 
 async function getUserByEmail(userEmail) {
 	console.log('[getUserByEmail]');
-	let usersFound = [];
+	const usersFound = [];
 
 	const snapshot = await usersCollectionRef.where('email', '==', userEmail).get();
 
@@ -20,7 +20,7 @@ async function getUserByEmail(userEmail) {
 		return false;
 	}
 
-	snapshot.forEach(doc => {
+	snapshot.forEach((doc) => {
 		usersFound.push(doc.data());
 	});
 
@@ -33,9 +33,9 @@ async function singInUpdate(userId, updatedInfo) {
 	const userRef = usersCollectionRef.doc(userId);
 
 	const result = await userRef.update({
-		"data_atualizacao": updatedInfo.data_atualizacao,
-		"ultimo_login": updatedInfo.ultimo_login,
-		"token": updatedInfo.token,
+		data_atualizacao: updatedInfo.data_atualizacao,
+		ultimo_login: updatedInfo.ultimo_login,
+		token: updatedInfo.token
 	});
 
 	return result;
@@ -43,7 +43,7 @@ async function singInUpdate(userId, updatedInfo) {
 
 async function getUserByToken(userToken) {
 	console.log('[getUserByToken]');
-	let usersFound = [];
+	const usersFound = [];
 
 	const snapshot = await usersCollectionRef.where('token', '==', userToken).get();
 
@@ -51,7 +51,7 @@ async function getUserByToken(userToken) {
 		return false;
 	}
 
-	snapshot.forEach(doc => {
+	snapshot.forEach((doc) => {
 		usersFound.push(doc.data());
 	});
 
@@ -63,4 +63,4 @@ module.exports = {
 	getUserByEmail,
 	singInUpdate,
 	getUserByToken
-}
+};

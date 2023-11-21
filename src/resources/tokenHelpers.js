@@ -16,15 +16,13 @@ function getTokenFromAuthHeader(authHeader) {
 }
 
 function validateToken(token) {
-	const isTokenValid = jwt.verify(token, tokenSecret, (err, decoded) => {
+	const isTokenValid = jwt.verify(token, tokenSecret, (err) => {
 		if (err) {
-			return err.name
+			return err.name;
 		}
 
-		return true
-	})
-
-	console.log(`isTokenValid = ${isTokenValid}`);
+		return true;
+	});
 
 	return isTokenValid;
 }
@@ -32,5 +30,5 @@ function validateToken(token) {
 module.exports = {
 	generateAccessToken,
 	getTokenFromAuthHeader,
-	validateToken,
+	validateToken
 };

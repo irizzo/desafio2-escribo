@@ -9,10 +9,10 @@ async function signUp(req, res) {
 		const { nome, email, senha, telefones } = req.body;
 
 		// verificações básicas
-		if(!nome || !email || !senha || !telefones ) {
+		if (!nome || !email || !senha || !telefones) {
 			res.status(401).send({
-				"mensagem": "Preencha todos os campos."
-			})
+				mensagem: 'Preencha todos os campos.'
+			});
 
 			return;
 		}
@@ -20,12 +20,12 @@ async function signUp(req, res) {
 		// verificar se o email já está cadastrado
 		const userFound = await userModel.getUserByEmail(email);
 
-		console.log(`userFound = ${JSON.stringify(userFound)}`);
+		// console.log(`userFound = ${JSON.stringify(userFound)}`);
 
-		if(userFound) { // email já está cadastrado
+		if (userFound) { // email já está cadastrado
 			res.status(400).send({
-				"mensagem": "E-mail já existente"
-			})
+				mensagem: 'E-mail já existente'
+			});
 
 			return;
 		}
@@ -38,34 +38,33 @@ async function signUp(req, res) {
 
 		// pegar hora/data atual
 		const currentDateAndTime = new Date();
-		console.log(`currentDateAndTime = ${currentDateAndTime}`);
+		// console.log(`currentDateAndTime = ${currentDateAndTime}`);
 
 		// salvar os dados
 		const userInfo = {
-			"id": generatedId,
+			id: generatedId,
 			nome,
 			email,
 			senha,
 			telefones,
-			"data_criacao": currentDateAndTime,
-			"data_atualizacao": currentDateAndTime,
-			"ultimo_login": currentDateAndTime,
-			"token": generatedToken
-		}
+			data_criacao: currentDateAndTime,
+			data_atualizacao: currentDateAndTime,
+			ultimo_login: currentDateAndTime,
+			token: generatedToken
+		};
 
 		await userModel.createDbUser(userInfo);
 
 		res.status(200).send({
-			"id": generatedId,
-			"data_criacao": currentDateAndTime,
-			"data_atualizacao": currentDateAndTime,
-			"ultimo_login": currentDateAndTime,
-			"token": generatedToken
+			id: generatedId,
+			data_criacao: currentDateAndTime,
+			data_atualizacao: currentDateAndTime,
+			ultimo_login: currentDateAndTime,
+			token: generatedToken
 		});
-
 	} catch (error) {
 		res.status(500).send({
-			'mensagem': error
+			mensagem: error
 		});
 	}
 }
@@ -79,54 +78,53 @@ async function signIn(req, res) {
 		// verificações básicas
 		if (!email || !senha) {
 			res.status(401).send({
-				"mensagem": "Preencha todos os campos."
-			})
+				mensagem: 'Preencha todos os campos.'
+			});
 
 			return;
 		}
 
 		// verificar se o email está cadastrado
 		const userFound = await userModel.getUserByEmail(email);
-		console.log(`userFound = ${JSON.stringify(userFound)}`);
+		// console.log(`userFound = ${JSON.stringify(userFound)}`);
 
 		if (!userFound) { // email não cadastrado
 			res.status(400).send({
-				"mensagem": "Usuário e/ou senha inválidos"
-			})
-		};
+				mensagem: 'Usuário e/ou senha inválidos'
+			});
+		}
 
 		// verificar se a senha está correta
 		if (userFound.senha !== senha) { // senha incorreta
 			res.status(401).send({
-				"mensagem": "Usuário e/ou senha inválidos"
-			})
-		};
+				mensagem: 'Usuário e/ou senha inválidos'
+			});
+		}
 
 		// pegar hora/data atual para atualizar último login
-		const currentDateAndTime = new Date;
-		console.log(`currentDateAndTime = ${currentDateAndTime}`);
+		const currentDateAndTime = new Date();
+		// console.log(`currentDateAndTime = ${currentDateAndTime}`);
 
 		// gerar jwt
 		const generatedToken = tokenHelpers.generateAccessToken(email);
-		console.log(`generatedToken = ${generatedToken}`);
+		// console.log(`generatedToken = ${generatedToken}`);
 
 		await userModel.singInUpdate(userFound.id, {
-			"data_atualizacao": currentDateAndTime,
-			"ultimo_login": currentDateAndTime,
-			"token": generatedToken,
+			data_atualizacao: currentDateAndTime,
+			ultimo_login: currentDateAndTime,
+			token: generatedToken
 		});
 
 		res.status(200).send({
-			"id": userFound.id,
-			"data_criacao": Date(userFound.data_criacao), // TODO: consertar formato que vem do BD
-			"data_atualizacao": currentDateAndTime,
-			"ultimo_login": currentDateAndTime,
-			"token": generatedToken,
-		})
-		
+			id: userFound.id,
+			data_criacao: Date(userFound.data_criacao), // TODO: consertar formato que vem do BD
+			data_atualizacao: currentDateAndTime,
+			ultimo_login: currentDateAndTime,
+			token: generatedToken
+		});
 	} catch (error) {
 		res.status(500).send({
-			'mensagem': error
+			mensagem: error
 		});
 	}
 }
@@ -134,7 +132,7 @@ async function signIn(req, res) {
 async function getUser(req, res) {
 	try {
 		// recuperar token do header (Requisição: Header Authentication com valor "Bearer {token}")
-		
+
 		const { authentication } = req.headers;
 
 		const token = tokenHelpers.getTokenFromAuthHeader(authentication);
@@ -142,27 +140,26 @@ async function getUser(req, res) {
 		const isTokenValid = tokenHelpers.validateToken(token);
 
 		// TODO: validar token
-		if (isTokenValid === "JsonWebTokenError") { // token inválido
+		if (isTokenValid === 'JsonWebTokenError') { // token inválido
 			res.status(401).send({
-				"mensagem": "Não autorizado"
+				mensagem: 'Não autorizado'
 			});
 			return;
 		}
 
-		if (isTokenValid === "TokenExpiredError") { // token expirado
+		if (isTokenValid === 'TokenExpiredError') { // token expirado
 			res.status(403).send({
-				"mensagem": "Sessão inválida"
-			})
+				mensagem: 'Sessão inválida'
+			});
 			return;
 		}
-		
-		res.status(200).send({
-			"mensagem": "Token válido"
-		});
 
+		res.status(200).send({
+			mensagem: 'Token válido'
+		});
 	} catch (error) {
 		res.status(500).send({
-			'mensagem': error
+			mensagem: error
 		});
 	}
 }
@@ -171,4 +168,4 @@ module.exports = {
 	signUp,
 	signIn,
 	getUser
-}
+};
