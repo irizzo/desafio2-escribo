@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel');
 const generateGUID = require('../resources/generateGUID');
 const tokenHelpers = require('../resources/tokenHelpers');
+const encryptingHelpers = require('../resources/encryptingHelpers');
 
 async function signUp(req, res) {
 	try {
@@ -31,23 +32,28 @@ async function signUp(req, res) {
 		// gerar GUID
 		const generatedId = generateGUID();
 
-		// gerar jwt
-		const generatedToken = tokenHelpers.generateAccessToken(email);
-
 		// pegar hora/data atual
 		const currentDateAndTime = new Date();
+
+		// encriptar a senha
+		const encryptedPass = encryptingHelpers.encryptString(senha);
+
+		// gerar jwt
+		const generatedToken = tokenHelpers.generateAccessToken(email);
+		// encriptar o token gerado
+		const encryptedToken = encryptingHelpers.encryptString(generatedToken);
 
 		// salvar os dados
 		const userInfo = {
 			id: generatedId,
 			nome,
 			email,
-			senha,
+			senha: encryptedPass,
 			telefones,
 			data_criacao: currentDateAndTime.toString(),
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
-			token: generatedToken
+			token: encryptedToken
 		};
 
 		await userModel.createDbUser(userInfo);
@@ -57,7 +63,7 @@ async function signUp(req, res) {
 			data_criacao: currentDateAndTime.toString(),
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
-			token: generatedToken
+			token: encryptedToken
 		});
 	} catch (error) {
 		res.status(500).send({
@@ -88,13 +94,15 @@ async function signIn(req, res) {
 			res.status(400).send({
 				mensagem: 'Usuário e/ou senha inválidos'
 			});
+			return;
 		}
 
 		// verificar se a senha está correta
-		if (userFound.senha !== senha) { // senha incorreta
+		if (!encryptingHelpers.comparePlainAndHash(senha, userFound.senha)) { // senha incorreta
 			res.status(401).send({
-				mensagem: 'Usuário e/ou senha inválidos'
+				mensagem: 'Senha inválida'
 			});
+			return;
 		}
 
 		// pegar hora/data atual para atualizar último login
@@ -102,11 +110,12 @@ async function signIn(req, res) {
 
 		// gerar jwt
 		const generatedToken = tokenHelpers.generateAccessToken(email);
+		const encryptedToken = encryptingHelpers.encryptString(generatedToken);
 
 		await userModel.singInUpdate(userFound.id, {
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
-			token: generatedToken
+			token: encryptedToken
 		});
 
 		res.status(200).send({
@@ -114,7 +123,7 @@ async function signIn(req, res) {
 			data_criacao: userFound.data_criacao,
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
-			token: generatedToken
+			token: encryptedToken
 		});
 	} catch (error) {
 		res.status(500).send({
