@@ -2,9 +2,9 @@
   "name": "desafio2-escribo",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/api/index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "server": "nodemon ./src/api/index.js",
+    "server": "nodemon ./src/index.js",
     "build": "webpack",
     "prod": "node dist/build.js"
   },

@@ -1,10 +1,10 @@
 require('dotenv/config');
-require('../firebaseConfig');
+require('./firebaseConfig');
 
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const userController = require('../controllers/userController');
+const userController = require('./controllers/userController');
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -25,3 +25,5 @@ app.get('/api/get-user', userController.getUser);
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
 });
+
+module.exports = app;
