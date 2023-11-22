@@ -1,7 +1,7 @@
 {
   "env": {
     "browser": true,
-    "commonjs": true,
+    "es6": true,
     "es2021": true
   },
   "extends": "airbnb-base",
@@ -21,6 +21,7 @@
     "no-tabs": "off",
     "object-curly-newline": "off",
     "no-console":"off",
-    "padded-blocks": [ "warn", "never"]
+    "padded-blocks": ["warn", "never"],
+    "import/extensions": [ "warn", "always", "ignorePackages"]
   }
 }

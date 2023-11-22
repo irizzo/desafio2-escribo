@@ -1,29 +1,32 @@
-require('dotenv/config');
-require('./firebaseConfig');
+import 'dotenv/config';
+import './firebaseConfig.js';
 
-const express = require('express');
-const bodyParser = require('body-parser');
+import express, { urlencoded, json } from 'express';
 
-const userController = require('./controllers/userController');
+import bp from 'body-parser';
+const { json: _json } = bp;
+
+
+import { signUp, signIn, getUser } from './controllers/userController.js';
 
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(bodyParser.json());
+app.use(urlencoded({ extended: true }));
+app.use(json()); // express
+app.use(_json()); // body-parser
 
 app.get('/', (req, res) => {
 	res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-	res.end('Desafio Técnico 2 - Escribo');
+	res.end('<h1> Desafio Técnico 2 - Escribo </h1>');
 });
 
-app.post('/api/sign-up', userController.signUp);
-app.post('/api/sign-in', userController.signIn);
-app.get('/api/get-user', userController.getUser);
+app.post('/api/sign-up', signUp);
+app.post('/api/sign-in', signIn);
+app.get('/api/get-user', getUser);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
 });
 
-module.exports = app;
+export default app;

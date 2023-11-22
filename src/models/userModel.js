@@ -1,8 +1,8 @@
-const { db } = require('../firebaseConfig');
+import db from '../firebaseConfig.js';
 
 const usersCollectionRef = db.collection('users');
 
-async function createDbUser(userInfo) {
+export async function createDbUser(userInfo) {
 	console.log('[createDbUser]');
 
 	const userRef = await usersCollectionRef.doc(userInfo.id).set(userInfo);
@@ -10,7 +10,7 @@ async function createDbUser(userInfo) {
 	return userRef;
 }
 
-async function getUserByEmail(userEmail) {
+export async function getUserByEmail(userEmail) {
 	console.log('[getUserByEmail]');
 	const usersFound = [];
 
@@ -27,7 +27,7 @@ async function getUserByEmail(userEmail) {
 	return usersFound[0];
 }
 
-async function singInUpdate(userId, updatedInfo) {
+export async function singInUpdate(userId, updatedInfo) {
 	console.log('[singInUpdate]');
 
 	const userRef = usersCollectionRef.doc(userId);
@@ -41,7 +41,7 @@ async function singInUpdate(userId, updatedInfo) {
 	return result;
 }
 
-async function getUserByToken(userToken) {
+export async function getUserByToken(userToken) {
 	console.log('[getUserByToken]');
 	const usersFound = [];
 
@@ -57,10 +57,3 @@ async function getUserByToken(userToken) {
 
 	return usersFound[0];
 }
-
-module.exports = {
-	createDbUser,
-	getUserByEmail,
-	singInUpdate,
-	getUserByToken
-};

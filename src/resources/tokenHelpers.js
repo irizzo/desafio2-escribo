@@ -1,11 +1,13 @@
-require('dotenv/config');
+import 'dotenv/config';
 
-const jwt = require('jsonwebtoken');
+// import { sign, verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+const { sign, verify } = jwt;
 
 const tokenSecret = process.env.TOKEN_SECRET;
 
 function generateAccessToken(userSecret) {
-	return jwt.sign({ userSecret }, tokenSecret, { expiresIn: 60 * 30 });
+	return sign({ userSecret }, tokenSecret, { expiresIn: 60 * 30 });
 }
 
 function getTokenFromAuthHeader(authHeader) {
@@ -16,7 +18,7 @@ function getTokenFromAuthHeader(authHeader) {
 }
 
 function validateToken(token) {
-	const isTokenValid = jwt.verify(token, tokenSecret, (err) => {
+	const isTokenValid = verify(token, tokenSecret, (err) => {
 		if (err) {
 			return err.name;
 		}
@@ -27,7 +29,7 @@ function validateToken(token) {
 	return isTokenValid;
 }
 
-module.exports = {
+export default {
 	generateAccessToken,
 	getTokenFromAuthHeader,
 	validateToken
