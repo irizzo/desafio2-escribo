@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
 	res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-	res.end('Desafio Técnico 2 - Escribo');
+	res.end('<h1>Desafio Técnico 2 - Escribo</h1>');
 });
 
 app.post('/api/sign-up', userController.signUp);
