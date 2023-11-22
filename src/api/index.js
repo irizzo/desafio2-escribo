@@ -13,10 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-	res.send({
-		mensagem: 'Desafio Técnico 2 - Escribo'
-	});
+app.get('/api/', (req, res) => {
+	res.setHeader('Content-Type', 'text/html');
+	res.end('Desafio Técnico 2 - Escribo');
 });
 
 app.post('/api/sign-up', userController.signUp);
