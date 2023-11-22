@@ -50,8 +50,6 @@ async function signUp(req, res) {
 
 		// gerar jwt
 		const generatedToken = tokenHelpers.generateAccessToken(email);
-		// encriptar o token gerado
-		const encryptedToken = encryptingHelpers.encryptString(generatedToken);
 
 		// salvar os dados
 		const userInfo = {
@@ -63,7 +61,7 @@ async function signUp(req, res) {
 			data_criacao: currentDateAndTime,
 			data_atualizacao: currentDateAndTime,
 			ultimo_login: currentDateAndTime,
-			token: encryptedToken
+			token: generatedToken
 		};
 
 		await userModel.createDbUser(userInfo);
@@ -73,7 +71,7 @@ async function signUp(req, res) {
 			data_criacao: currentDateAndTime.toString(),
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
-			token: encryptedToken
+			token: generatedToken
 		});
 	} catch (error) {
 		res.status(500).send({
@@ -128,12 +126,11 @@ async function signIn(req, res) {
 
 		// gerar jwt
 		const generatedToken = tokenHelpers.generateAccessToken(email);
-		const encryptedToken = encryptingHelpers.encryptString(generatedToken);
 
 		await userModel.singInUpdate(userFound.id, {
 			data_atualizacao: currentDateAndTime,
 			ultimo_login: currentDateAndTime,
-			token: encryptedToken
+			token: generatedToken
 		});
 
 		res.status(200).send({
@@ -141,7 +138,7 @@ async function signIn(req, res) {
 			data_criacao: Date(userFound.data_criacao).toString(),
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
-			token: encryptedToken
+			token: generatedToken
 		});
 	} catch (error) {
 		res.status(500).send({
