@@ -50,9 +50,9 @@ async function signUp(req, res) {
 			email,
 			senha: encryptedPass,
 			telefones,
-			data_criacao: currentDateAndTime.toString(),
-			data_atualizacao: currentDateAndTime.toString(),
-			ultimo_login: currentDateAndTime.toString(),
+			data_criacao: currentDateAndTime,
+			data_atualizacao: currentDateAndTime,
+			ultimo_login: currentDateAndTime,
 			token: encryptedToken
 		};
 
@@ -113,14 +113,14 @@ async function signIn(req, res) {
 		const encryptedToken = encryptingHelpers.encryptString(generatedToken);
 
 		await userModel.singInUpdate(userFound.id, {
-			data_atualizacao: currentDateAndTime.toString(),
-			ultimo_login: currentDateAndTime.toString(),
+			data_atualizacao: currentDateAndTime,
+			ultimo_login: currentDateAndTime,
 			token: encryptedToken
 		});
 
 		res.status(200).send({
 			id: userFound.id,
-			data_criacao: userFound.data_criacao,
+			data_criacao: Date(userFound.data_criacao).toString(),
 			data_atualizacao: currentDateAndTime.toString(),
 			ultimo_login: currentDateAndTime.toString(),
 			token: encryptedToken
