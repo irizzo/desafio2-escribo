@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.json());
 
-app.get('/api/', (req, res) => {
+app.get('/', (req, res) => {
 	res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 	res.end('Desafio Técnico 2 - Escribo');
 });
