@@ -1,10 +1,12 @@
-import { join } from 'path';
+const path = require('path');
 
-export const mode = 'production';
-export const entry = './src/index.js';
-export const output = {
-	path: join(__dirname, 'dist'),
-	publicPath: '/',
-	filename: 'build.js'
+module.exports = {
+	mode: 'production',
+	entry: './src/index.js',
+	output: {
+		path: path.join(__dirname, 'dist'),
+		publicPath: '/',
+		filename: 'build.js'
+	},
+	target: 'node'
 };
-export const target = 'node';

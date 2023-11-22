@@ -1,8 +1,8 @@
 /* eslint-disable import/no-unresolved */
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
-import 'dotenv/config';
+require('dotenv/config');
 
 const serviceAccount = {
 	type: process.env.TYPE,
@@ -24,4 +24,4 @@ initializeApp({
 
 const db = getFirestore();
 
-export default db;
+module.exports = { db };

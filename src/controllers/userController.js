@@ -1,6 +1,6 @@
-import { getUserByEmail, createDbUser, singInUpdate } from '../models/userModel.js';
-import generateGUID from '../resources/generateGUID.js';
-import tokenHelpers from '../resources/tokenHelpers.js';
+const userModel = require('../models/userModel');
+const generateGUID = require('../resources/generateGUID');
+const tokenHelpers = require('../resources/tokenHelpers');
 
 async function signUp(req, res) {
 	try {
@@ -18,7 +18,7 @@ async function signUp(req, res) {
 		}
 
 		// verificar se o email já está cadastrado
-		const userFound = await getUserByEmail(email);
+		const userFound = await userModel.getUserByEmail(email);
 
 		if (userFound) { // email já está cadastrado
 			res.status(400).send({
@@ -50,7 +50,7 @@ async function signUp(req, res) {
 			token: generatedToken
 		};
 
-		await createDbUser(userInfo);
+		await userModel.createDbUser(userInfo);
 
 		res.status(200).send({
 			id: generatedId,
@@ -82,7 +82,7 @@ async function signIn(req, res) {
 		}
 
 		// verificar se o email está cadastrado
-		const userFound = await getUserByEmail(email);
+		const userFound = await userModel.getUserByEmail(email);
 
 		if (!userFound) { // email não cadastrado
 			res.status(400).send({
@@ -103,7 +103,7 @@ async function signIn(req, res) {
 		// gerar jwt
 		const generatedToken = tokenHelpers.generateAccessToken(email);
 
-		await singInUpdate(userFound.id, {
+		await userModel.singInUpdate(userFound.id, {
 			data_atualizacao: currentDateAndTime,
 			ultimo_login: currentDateAndTime,
 			token: generatedToken
@@ -156,7 +156,7 @@ async function getUser(req, res) {
 	}
 }
 
-export {
+module.exports = {
 	signUp,
 	signIn,
 	getUser
