@@ -1,7 +1,9 @@
 const userModel = require('../models/userModel');
+
 const generateGUID = require('../resources/generateGUID');
 const tokenHelpers = require('../resources/tokenHelpers');
 const encryptingHelpers = require('../resources/encryptingHelpers');
+const { emailValidation } = require('../resources/validations');
 
 async function signUp(req, res) {
 	try {
@@ -13,6 +15,14 @@ async function signUp(req, res) {
 		if (!nome || !email || !senha || !telefones) {
 			res.status(401).send({
 				mensagem: 'Preencha todos os campos.'
+			});
+
+			return;
+		}
+
+		if (!emailValidation(email)) {
+			res.status(400).send({
+				mensagem: 'E-mail inválido'
 			});
 
 			return;
@@ -87,6 +97,14 @@ async function signIn(req, res) {
 			return;
 		}
 
+		if (!emailValidation(email)) {
+			res.status(400).send({
+				mensagem: 'E-mail inválido'
+			});
+
+			return;
+		}
+
 		// verificar se o email está cadastrado
 		const userFound = await userModel.getUserByEmail(email);
 
@@ -135,6 +153,13 @@ async function signIn(req, res) {
 async function getUser(req, res) {
 	try {
 		const { authentication } = req.headers;
+
+		if (!authentication) { // não há token informado
+			res.status(401).send({
+				mensagem: 'Não autorizado'
+			});
+			return;
+		}
 
 		const token = tokenHelpers.getTokenFromAuthHeader(authentication);
 
