@@ -44,9 +44,9 @@ async function signUp(req, res) {
 			email,
 			senha,
 			telefones,
-			data_criacao: currentDateAndTime,
-			data_atualizacao: currentDateAndTime,
-			ultimo_login: currentDateAndTime,
+			data_criacao: currentDateAndTime.toString(),
+			data_atualizacao: currentDateAndTime.toString(),
+			ultimo_login: currentDateAndTime.toString(),
 			token: generatedToken
 		};
 
@@ -54,9 +54,9 @@ async function signUp(req, res) {
 
 		res.status(200).send({
 			id: generatedId,
-			data_criacao: currentDateAndTime,
-			data_atualizacao: currentDateAndTime,
-			ultimo_login: currentDateAndTime,
+			data_criacao: currentDateAndTime.toString(),
+			data_atualizacao: currentDateAndTime.toString(),
+			ultimo_login: currentDateAndTime.toString(),
 			token: generatedToken
 		});
 	} catch (error) {
@@ -104,16 +104,16 @@ async function signIn(req, res) {
 		const generatedToken = tokenHelpers.generateAccessToken(email);
 
 		await userModel.singInUpdate(userFound.id, {
-			data_atualizacao: currentDateAndTime,
-			ultimo_login: currentDateAndTime,
+			data_atualizacao: currentDateAndTime.toString(),
+			ultimo_login: currentDateAndTime.toString(),
 			token: generatedToken
 		});
 
 		res.status(200).send({
 			id: userFound.id,
-			data_criacao: Date(userFound.data_criacao), // TODO: ajustar formato que vem do BD
-			data_atualizacao: currentDateAndTime,
-			ultimo_login: currentDateAndTime,
+			data_criacao: userFound.data_criacao,
+			data_atualizacao: currentDateAndTime.toString(),
+			ultimo_login: currentDateAndTime.toString(),
 			token: generatedToken
 		});
 	} catch (error) {
@@ -129,9 +129,9 @@ async function getUser(req, res) {
 
 		const token = tokenHelpers.getTokenFromAuthHeader(authentication);
 
+		// validar token
 		const isTokenValid = tokenHelpers.validateToken(token);
 
-		// TODO: validar token
 		if (isTokenValid === 'JsonWebTokenError') { // token inválido
 			res.status(401).send({
 				mensagem: 'Não autorizado'
