@@ -20,8 +20,6 @@ async function signUp(req, res) {
 		// verificar se o email já está cadastrado
 		const userFound = await userModel.getUserByEmail(email);
 
-		// console.log(`userFound = ${JSON.stringify(userFound)}`);
-
 		if (userFound) { // email já está cadastrado
 			res.status(400).send({
 				mensagem: 'E-mail já existente'
@@ -38,7 +36,6 @@ async function signUp(req, res) {
 
 		// pegar hora/data atual
 		const currentDateAndTime = new Date();
-		// console.log(`currentDateAndTime = ${currentDateAndTime}`);
 
 		// salvar os dados
 		const userInfo = {
@@ -86,7 +83,6 @@ async function signIn(req, res) {
 
 		// verificar se o email está cadastrado
 		const userFound = await userModel.getUserByEmail(email);
-		// console.log(`userFound = ${JSON.stringify(userFound)}`);
 
 		if (!userFound) { // email não cadastrado
 			res.status(400).send({
@@ -103,11 +99,9 @@ async function signIn(req, res) {
 
 		// pegar hora/data atual para atualizar último login
 		const currentDateAndTime = new Date();
-		// console.log(`currentDateAndTime = ${currentDateAndTime}`);
 
 		// gerar jwt
 		const generatedToken = tokenHelpers.generateAccessToken(email);
-		// console.log(`generatedToken = ${generatedToken}`);
 
 		await userModel.singInUpdate(userFound.id, {
 			data_atualizacao: currentDateAndTime,
@@ -117,7 +111,7 @@ async function signIn(req, res) {
 
 		res.status(200).send({
 			id: userFound.id,
-			data_criacao: Date(userFound.data_criacao), // TODO: consertar formato que vem do BD
+			data_criacao: Date(userFound.data_criacao), // TODO: ajustar formato que vem do BD
 			data_atualizacao: currentDateAndTime,
 			ultimo_login: currentDateAndTime,
 			token: generatedToken
@@ -131,8 +125,6 @@ async function signIn(req, res) {
 
 async function getUser(req, res) {
 	try {
-		// recuperar token do header (Requisição: Header Authentication com valor "Bearer {token}")
-
 		const { authentication } = req.headers;
 
 		const token = tokenHelpers.getTokenFromAuthHeader(authentication);
